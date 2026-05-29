@@ -1,28 +1,21 @@
 <?php
 include("conexao.php");
 
+session_start();
+
+if (!isset($_SESSION['usuario'])) {
+    header("Location: login.php");
+    exit;
+}
+
 $mensagem = '';
 $tipoMensagem = '';
 
 
-$sql = "SELECT * FROM usuarios";
-$resultado = mysqli_query($conn, $sql);
-$usuarios = [];
-$total = 0;
-while ($usuario = mysqli_fetch_assoc($resultado)) {
-    $usuarios[] = $usuario;
-    $total++;
-}
+$sqlTotal = "SELECT * FROM usuarios";
+$resultTotal = $conn->query($sqlTotal);
 
-
-
-session_start();
-
-if (!isset($_SESSION['usuario'])) {
-
-    header("Location: login.php");
-    exit;
-}
+$total = $resultTotal->num_rows;
 
 
 ?>
@@ -274,34 +267,91 @@ if (!isset($_SESSION['usuario'])) {
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-outline-variant/10">
-                            <?php foreach ($usuarios as $u): ?>
+
+                            <?php
+
+                            $sql = "SELECT * FROM usuarios";
+                            $result = $conn->query($sql);
+
+                            while ($row = $result->fetch_assoc()) {
+
+                            ?>
+
                                 <tr class="user-row transition-colors">
-                                    <td class="px-6 py-4 text-sm font-medium text-on-surface-variant">#<?= htmlspecialchars($u['id']) ?></td>
+
+                                    <td class="px-6 py-4 text-sm font-medium text-on-surface-variant">
+                                        #<?php echo $row['id']; ?>
+                                    </td>
+
                                     <td class="px-6 py-4">
+
                                         <div class="flex items-center gap-3">
+
                                             <div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-primary border border-outline-variant/30 shrink-0">
-                                                <?= strtoupper(mb_substr($u['nome'], 0, 1)) ?>
+
+                                                <?php echo strtoupper(substr($row['nome'], 0, 1)); ?>
+
                                             </div>
-                                            <span class="text-sm font-bold text-primary"><?= htmlspecialchars($u['nome']) ?></span>
+
+                                            <span class="text-sm font-bold text-primary">
+
+                                                <?php echo $row['nome']; ?>
+
+                                            </span>
+
                                         </div>
+
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-on-surface-variant"><?= htmlspecialchars($u['email']) ?></td>
+
+                                    <td class="px-6 py-4 text-sm text-on-surface-variant">
+
+                                        <?php echo $row['email']; ?>
+
+                                    </td>
+
                                     <td class="px-6 py-4">
+
                                         <div class="flex items-center gap-2">
+
                                             <button
-                                                onclick="abrirModalEditar(<?= $u['id'] ?>, '<?= addslashes(htmlspecialchars($u['nome'])) ?>', '<?= addslashes(htmlspecialchars($u['email'])) ?>')"
-                                                class="p-2 text-primary hover:bg-surface-container rounded-lg transition-colors" title="Editar">
-                                                <span class="material-symbols-outlined text-[20px]">edit</span>
+                                                onclick="abrirModalEditar(
+                    <?php echo $row['id']; ?>,
+                    '<?php echo addslashes($row['nome']); ?>',
+                    '<?php echo addslashes($row['email']); ?>'
+                )"
+
+                                                class="p-2 text-primary hover:bg-surface-container rounded-lg transition-colors">
+
+                                                <span class="material-symbols-outlined text-[20px]">
+                                                    edit
+                                                </span>
+
                                             </button>
+
                                             <button
-                                                onclick="confirmarExclusao(<?= $u['id'] ?>, '<?= addslashes(htmlspecialchars($u['nome'])) ?>')"
-                                                class="p-2 text-error hover:bg-error-container/20 rounded-lg transition-colors" title="Excluir">
-                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                                onclick="confirmarExclusao(
+                    <?php echo $row['id']; ?>,
+                    '<?php echo addslashes($row['nome']); ?>'
+                )"
+
+                                                class="p-2 text-error hover:bg-error-container/20 rounded-lg transition-colors">
+
+                                                <span class="material-symbols-outlined text-[20px]">
+                                                    delete
+                                                </span>
+
                                             </button>
+
                                         </div>
+
                                     </td>
+
                                 </tr>
-                            <?php endforeach; ?>
+
+                            <?php
+                            }
+                            ?>
+
                         </tbody>
                     </table>
                 </div>
